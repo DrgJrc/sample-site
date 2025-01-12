@@ -16,18 +16,12 @@ if ($conn->connect_error) {
 // Get total registered donors
 $total_donors_query = "SELECT COUNT(*) AS total FROM users";
 $total_donors_result = $conn->query($total_donors_query);
-$total_donors = 0;
-if ($total_donors_result->num_rows > 0) {
-    $total_donors = $total_donors_result->fetch_assoc()['total'];
-}
+$total_donors = ($total_donors_result->num_rows > 0) ? $total_donors_result->fetch_assoc()['total'] : 0;
 
-// Get available donors (those who haven't donated in the past 3 months)
+// Get available donors (those who haven't donated blood in the last 3 months)
 $available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE last_donation <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
 $available_donors_result = $conn->query($available_donors_query);
-$available_donors = 0;
-if ($available_donors_result->num_rows > 0) {
-    $available_donors = $available_donors_result->fetch_assoc()['available'];
-}
+$available_donors = ($available_donors_result->num_rows > 0) ? $available_donors_result->fetch_assoc()['available'] : 0;
 
 $conn->close();
 ?>
