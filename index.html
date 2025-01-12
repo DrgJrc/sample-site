@@ -1,21 +1,33 @@
 <?php
-// Connect to the database
-$conn = new mysqli("localhost", "root", "adminpassword", "blood_donation");
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "root";
+$database = "blood_donation";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $database);
 
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get the total number of donors
+// Get total registered donors
 $total_donors_query = "SELECT COUNT(*) AS total FROM users";
 $total_donors_result = $conn->query($total_donors_query);
-$total_donors = $total_donors_result->fetch_assoc()['total'];
+$total_donors = 0;
+if ($total_donors_result->num_rows > 0) {
+    $total_donors = $total_donors_result->fetch_assoc()['total'];
+}
 
-// Get the number of available donors (those who haven't donated blood in the past 3 months)
+// Get available donors (those who haven't donated in the past 3 months)
 $available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE last_donation <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
 $available_donors_result = $conn->query($available_donors_query);
-$available_donors = $available_donors_result->fetch_assoc()['available'];
+$available_donors = 0;
+if ($available_donors_result->num_rows > 0) {
+    $available_donors = $available_donors_result->fetch_assoc()['available'];
+}
 
 $conn->close();
 ?>
@@ -25,98 +37,51 @@ $conn->close();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blood Donation Website</title>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .navbar {
-            margin-bottom: 20px;
-        }
-        .hero {
-            background-color: #e63946;
-            color: white;
-            padding: 50px 0;
-            text-align: center;
-        }
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-        .hero p {
-            font-size: 24px;
-        }
-        .statistics {
-            margin: 20px 0;
-        }
-        footer {
-            background-color: #343a40;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-        }
-    </style>
+    <title>Blood Donation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#">Blood Donation</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Sign In</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Register as a Donor</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
-
-<!-- Hero Section -->
-<div class="hero">
-    <h1>Donate Blood, Save Life</h1>
-    <p>A drop of blood can save a life!</p>
-</div>
-
-<!-- Statistics Section -->
-<div class="container">
-    <h2 class="text-center">Blood Donation Statistics</h2>
-    <div class="row statistics">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Total Registered Donors</h3>
-                    <p class="card-text"><?php echo $total_donors; ?></p>
-                </div>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Blood Donation</a>
+            <div class="d-flex">
+                <a class="btn btn-outline-light me-2" href="signin.php">Sign In</a>
+                <a class="btn btn-outline-light" href="register.php">Register as a Donor</a>
             </div>
         </div>
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    <h3 class="card-title">Available Donors</h3>
-                    <p class="card-text"><?php echo $available_donors; ?></p>
+    </nav>
+
+    <div class="container text-center mt-5">
+        <h1 class="display-4 text-danger">Donate Blood, Save Life</h1>
+        <p class="lead">A drop of blood can save a life!</p>
+    </div>
+
+    <div class="container mt-4">
+        <h2 class="text-center">Blood Donation Statistics</h2>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Registered Donors</h5>
+                        <p class="card-text display-5"><?= htmlspecialchars($total_donors) ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Available Donors</h5>
+                        <p class="card-text display-5"><?= htmlspecialchars($available_donors) ?></p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Footer -->
-<footer>
-    <p>&copy; 2025 Blood Donation. All rights reserved.</p>
-</footer>
+    <footer class="bg-dark text-center text-white mt-5 p-3">
+        © 2025 Blood Donation. All rights reserved.
+    </footer>
 
-<!-- Bootstrap JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
