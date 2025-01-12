@@ -1,12 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Welcome BCA VI Sem </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Blood Donation - Home</title>
 </head>
 <body>
-    <h1>Hello JBCA VIth Sem Students, How are you!</h1>
-    <h1>If this is successfull then it will be displayed.</h1>
-    <h1>Hurray we are successfull</h1>
-    <p>This is a sample website hosted using Vagrant vm and Nginx.</p>
+    <h1>Donate Blood, Save Life</h1>
+    <p><strong>Slogan:</strong> A drop of blood can save a life!</p>
+
+    <h2>Blood Donation Statistics</h2>
+
+    <?php
+    require 'db.php';
+
+    // Total donors
+    $total_donors_query = "SELECT COUNT(*) AS total FROM users";
+    $total_donors_result = $conn->query($total_donors_query);
+    $total_donors = $total_donors_result->fetch_assoc()['total'];
+
+    // Available donors (those who haven't donated blood in the past 3 months)
+    $available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE last_donation <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
+    $available_donors_result = $conn->query($available_donors_query);
+    $available_donors = $available_donors_result->fetch_assoc()['available'];
+
+    echo "<p><strong>Total Registered Donors:</strong> $total_donors</p>";
+    echo "<p><strong>Available Donors:</strong> $available_donors</p>";
+
+    $conn->close();
+    ?>
+
+    <p><a href="login.php">Sign In</a> | <a href="register.php">Register as a Donor</a></p>
 </body>
 </html>
