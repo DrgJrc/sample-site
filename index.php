@@ -25,138 +25,105 @@ $blood_group_stats_result = $conn->query($blood_group_stats_query);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blood Donation Site</title>
-    <link rel="stylesheet" href="css/style.css">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
+            background-color: #f8f9fa;
         }
         header {
-            background-color: #d9534f;
+            background-color: #dc3545;
             color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
-        nav {
-            background-color: #333;
-            padding: 10px 0;
+            padding: 20px;
             text-align: center;
         }
         nav a {
             color: white;
             text-decoration: none;
             margin: 0 15px;
-            font-size: 18px;
         }
-        nav a:hover {
-            text-decoration: underline;
-        }
-        .statistics, .blood-group-stats {
-            margin: 20px;
-            padding: 20px;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .stat-box {
-            display: inline-block;
-            width: 45%;
-            margin: 10px 2.5%;
-            padding: 20px;
-            text-align: center;
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        }
-        .stat-box h3 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .stat-box p {
-            font-size: 36px;
-            color: #007bff;
+        .card {
+            margin: 20px 0;
         }
         table {
-            width: 100%;
-            border-collapse: collapse;
             margin-top: 20px;
-        }
-        th, td {
-            padding: 10px;
-            text-align: center;
-            border: 1px solid #ddd;
-        }
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-        footer {
-            text-align: center;
-            padding: 10px;
-            background-color: #333;
-            color: white;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Donate Blood, Save Life</h1>
-        <p>A drop of blood can save a life!</p>
-    </header>
 
-    <!-- Navigation Bar -->
-    <nav>
-        <a href="register.php">Register as a Donor</a>
-        <a href="login.php">Sign In</a>
-    </nav>
+<header>
+    <h1>Donate Blood, Save Life</h1>
+    <p>A drop of blood can save a life!</p>
+</header>
 
-    <!-- Statistics Section -->
-    <section class="statistics">
-        <div class="stat-box">
-            <h3>Total Registered Donors</h3>
-            <p><?php echo $total_donors_result['total']; ?></p>
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Blood Donation</a>
+        <div class="navbar-nav">
+            <a class="nav-link" href="register.php">Register as a Donor</a>
+            <a class="nav-link" href="login.php">Sign In</a>
         </div>
-        <div class="stat-box">
-            <h3>Available Donors</h3>
-            <p><?php echo $available_donors_result['available']; ?></p>
-        </div>
-    </section>
+    </div>
+</nav>
 
-    <!-- Blood Group-wise Statistics Section -->
-    <section class="blood-group-stats">
-        <h3>Blood Group-wise Statistics</h3>
-        <table>
-            <thead>
+<!-- Main Content -->
+<div class="container my-5">
+    <div class="row">
+        <!-- Total Registered Donors -->
+        <div class="col-md-6">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Registered Donors</h5>
+                    <p class="card-text display-4"><?php echo $total_donors_result['total']; ?></p>
+                </div>
+            </div>
+        </div>
+        <!-- Available Donors -->
+        <div class="col-md-6">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Available Donors</h5>
+                    <p class="card-text display-4"><?php echo $available_donors_result['available']; ?></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blood Group-wise Statistics -->
+    <h3 class="mt-5">Blood Group-wise Statistics</h3>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Blood Group</th>
+                <th>Total Donors</th>
+                <th>Available Donors</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($row = $blood_group_stats_result->fetch_assoc()) { ?>
                 <tr>
-                    <th>Blood Group</th>
-                    <th>Total Donors</th>
-                    <th>Available Donors</th>
+                    <td><?php echo $row['blood_group']; ?></td>
+                    <td><?php echo $row['total']; ?></td>
+                    <td><?php echo $row['available']; ?></td>
                 </tr>
-            </thead>
-            <tbody>
-                <?php while ($row = $blood_group_stats_result->fetch_assoc()) { ?>
-                    <tr>
-                        <td><?php echo $row['blood_group']; ?></td>
-                        <td><?php echo $row['total']; ?></td>
-                        <td><?php echo $row['available']; ?></td>
-                    </tr>
-                <?php } ?>
-            </tbody>
-        </table>
-    </section>
+            <?php } ?>
+        </tbody>
+    </table>
+</div>
 
-    <!-- Footer Section -->
-    <footer>
-        <p>&copy; 2025 Blood Donation. All rights reserved.</p>
-    </footer>
+<!-- Footer -->
+<footer class="text-center text-white bg-dark py-3">
+    <p>&copy; 2025 Blood Donation. All rights reserved.</p>
+</footer>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <?php
 $conn->close();
 ?>
+
 </body>
 </html>
