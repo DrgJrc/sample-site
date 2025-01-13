@@ -1,14 +1,17 @@
 <?php
 // Database connection
 $conn = new mysqli('localhost', 'root', 'root', 'blood_donation');
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Get total donors and available donors
+// Get total donors
 $total_donors_query = "SELECT COUNT(*) AS total FROM users";
-$available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE availability = 1";
 $total_donors_result = $conn->query($total_donors_query)->fetch_assoc();
+
+// Get available donors
+$available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE availability = 1";
 $available_donors_result = $conn->query($available_donors_query)->fetch_assoc();
 
 // Get blood group-wise statistics
@@ -68,6 +71,7 @@ $blood_group_stats_result = $conn->query($blood_group_stats_query);
     </footer>
 </body>
 </html>
+
 <?php
 $conn->close();
 ?>
