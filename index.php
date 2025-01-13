@@ -29,6 +29,9 @@
         .stats-card {
             margin: 20px 0;
         }
+        .table-section {
+            margin-top: 30px;
+        }
     </style>
 </head>
 <body>
@@ -47,6 +50,33 @@
             <a class="nav-link" href="register.php">Register as a Donor</a>
         </div>
     </nav>
+
+    <!-- PHP Code to Fetch Statistics -->
+    <?php
+        // Database connection
+        $conn = new mysqli('localhost', 'root', 'root', 'blood_donation');
+        if ($conn->connect_error) {
+            die('Connection failed: ' . $conn->connect_error);
+        }
+
+        // Total Registered Donors
+        $total_donors_query = "SELECT COUNT(*) AS total FROM users";
+        $total_donors_result = $conn->query($total_donors_query);
+        $total_donors = $total_donors_result->fetch_assoc()['total'];
+
+        // Available Donors (who haven't donated blood in the past 3 months)
+        $available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE last_donation <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH)";
+        $available_donors_result = $conn->query($available_donors_query);
+        $available_donors = $available_donors_result->fetch_assoc()['available'];
+
+        // Blood Group-wise Statistics
+        $blood_group_query = "SELECT blood_group, 
+                                     COUNT(*) AS total, 
+                                     SUM(CASE WHEN last_donation <= DATE_SUB(CURDATE(), INTERVAL 3 MONTH) THEN 1 ELSE 0 END) AS available 
+                              FROM users 
+                              GROUP BY blood_group";
+        $blood_group_result = $conn->query($blood_group_query);
+    ?>
 
     <!-- Main Content -->
     <div class="container">
@@ -68,6 +98,35 @@
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Blood Group-wise Statistics Table -->
+        <div class="table-section">
+            <h3>Blood Group-wise Statistics</h3>
+            <table class="table table-bordered table-striped">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Blood Group</th>
+                        <th>Total Donors</th>
+                        <th>Available Donors</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        if ($blood_group_result->num_rows > 0) {
+                            while ($row = $blood_group_result->fetch_assoc()) {
+                                echo "<tr>
+                                        <td>" . $row['blood_group'] . "</td>
+                                        <td>" . $row['total'] . "</td>
+                                        <td>" . $row['available'] . "</td>
+                                      </tr>";
+                            }
+                        } else {
+                            echo "<tr><td colspan='3'>No data available</td></tr>";
+                        }
+                    ?>
+                </tbody>
+            </table>
         </div>
     </div>
 
