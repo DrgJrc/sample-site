@@ -1,10 +1,27 @@
+<?php
+// Database connection
+$conn = new mysqli('localhost', 'root', 'root', 'blood_donation');
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get total donors and available donors
+$total_donors_query = "SELECT COUNT(*) AS total FROM users";
+$available_donors_query = "SELECT COUNT(*) AS available FROM users WHERE availability = 1";
+$total_donors_result = $conn->query($total_donors_query)->fetch_assoc();
+$available_donors_result = $conn->query($available_donors_query)->fetch_assoc();
+
+// Get blood group-wise statistics
+$blood_group_stats_query = "SELECT blood_group, COUNT(*) AS total, SUM(availability) AS available FROM users GROUP BY blood_group";
+$blood_group_stats_result = $conn->query($blood_group_stats_query);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blood Donation Site</title>
-    <!-- Link to the CSS file -->
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,11 +33,11 @@
     <section class="statistics">
         <div class="stat-box">
             <h3>Total Registered Donors</h3>
-            <p><?php echo $total_donors; ?></p>
+            <p><?php echo $total_donors_result['total']; ?></p>
         </div>
         <div class="stat-box">
             <h3>Available Donors</h3>
-            <p><?php echo $available_donors; ?></p>
+            <p><?php echo $available_donors_result['available']; ?></p>
         </div>
     </section>
 
@@ -51,7 +68,6 @@
     </footer>
 </body>
 </html>
-
 <?php
 $conn->close();
 ?>
