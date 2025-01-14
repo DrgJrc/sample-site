@@ -100,7 +100,7 @@ $blood_group_stats_result = $conn->query($blood_group_stats_query);
                 <th>Total Donors</th>
                 <th>Available Donors</th>
             </tr>
-        </thead>
+        </thead> 
         <tbody>
             <?php while ($row = $blood_group_stats_result->fetch_assoc()) { ?>
                 <tr>
