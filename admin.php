@@ -50,9 +50,13 @@ $result = $conn->query($query);
             background-color: #f8f9fa;
         }
         .container {
-            margin: 0 auto;
-            width: 90%; /* 5% margin on each side */
-            max-width: 1200px; /* Maximum width for larger screens */
+            margin: 20px auto;
+            padding: 0 5%; /* Left and right margin of 5% */
+            max-width: 1200px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         .table-wrapper {
             margin-top: 20px;
