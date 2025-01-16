@@ -15,16 +15,10 @@
         .table-wrapper {
             margin-top: 20px;
         }
-        .status-update-form select, .status-update-form textarea {
-            margin-bottom: 10px;
-        }
-        .status-update-form button {
-            margin-top: 10px;
-        }
         .search-input {
             width: 100%;
-            margin-bottom: 10px;
             padding: 5px;
+            margin-bottom: 10px;
             border-radius: 4px;
             border: 1px solid #ddd;
         }
@@ -35,7 +29,7 @@
 
     <div class="container">
         <h1 class="text-center text-primary">Admin Panel</h1>
-        
+
         <?php if (isset($message)) { ?>
             <div class="alert alert-success text-center">
                 <?php echo $message; ?>
@@ -46,6 +40,7 @@
             <table class="table table-bordered table-striped" id="adminTable">
                 <thead class="table-dark">
                     <tr>
+                        <!-- Search Boxes -->
                         <th><input type="text" class="search-input" placeholder="Search Request ID" onkeyup="filterTable(0)"></th>
                         <th><input type="text" class="search-input" placeholder="Search Requester Name" onkeyup="filterTable(1)"></th>
                         <th><input type="text" class="search-input" placeholder="Search Requester Mobile" onkeyup="filterTable(2)"></th>
