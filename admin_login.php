@@ -15,14 +15,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = htmlspecialchars($_POST['password']);
 
     // Fetch admin data
-    $query = "SELECT * FROM admin_login WHERE username = '$username'";
-    $result = $conn->query($query);
+    $query = "SELECT * FROM admin_login WHERE username = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
 
         // Verify password and check status
-        if (md5($password) == $admin['password']) {
+        if (md5($password) === $admin['password']) { // MD5 check
             if ($admin['status'] == 1) { // Check if active
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $admin['username'];
