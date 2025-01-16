@@ -20,9 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
 }
 
 // Fetch all blood requests
-$query = "SELECT br.id, br.requester_name, br.recipient_name, u.name AS donor_name, 
-          u.mobile AS donor_mobile, u.email AS donor_email, u.blood_group, br.hospital, 
-          br.message, br.status, br.rejection_reason 
+$query = "SELECT br.id, br.requester_name, br.requester_mobile, br.requester_email, 
+          br.recipient_name, u.name AS donor_name, u.mobile AS donor_mobile, u.email AS donor_email, 
+          u.blood_group, br.hospital, br.message, br.status, br.rejection_reason 
           FROM blood_requests br 
           LEFT JOIN users u ON br.donor_id = u.id 
           ORDER BY br.id DESC";
@@ -70,6 +70,8 @@ $result = $conn->query($query);
                     <tr>
                         <th>Request ID</th>
                         <th>Requester Name</th>
+                        <th>Requester Mobile</th>
+                        <th>Requester Email</th>
                         <th>Recipient Name</th>
                         <th>Donor Name</th>
                         <th>Donor Mobile</th>
@@ -87,10 +89,12 @@ $result = $conn->query($query);
                         <tr>
                             <td><?php echo $row['id']; ?></td>
                             <td><?php echo $row['requester_name']; ?></td>
+                            <td><?php echo $row['requester_mobile']; ?></td>
+                            <td><?php echo $row['requester_email'] ?: 'N/A'; ?></td>
                             <td><?php echo $row['recipient_name']; ?></td>
                             <td><?php echo $row['donor_name']; ?></td>
                             <td><?php echo $row['donor_mobile']; ?></td>
-                            <td><?php echo $row['donor_email']; ?></td>
+                            <td><?php echo $row['donor_email'] ?: 'N/A'; ?></td>
                             <td><?php echo $row['blood_group']; ?></td>
                             <td><?php echo $row['hospital']; ?></td>
                             <td><?php echo $row['message']; ?></td>
