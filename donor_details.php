@@ -57,6 +57,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
             $result = $conn->query($query);
 
             if ($result && $result->num_rows > 0) {
+                echo '<form action="request_blood.php" method="POST">';
                 echo '<table class="table table-bordered table-striped">';
                 echo '<thead class="table-dark">';
                 echo '<tr>
@@ -67,7 +68,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                         <th>Last Donation Date</th>
                         <th>Availability</th>
                         <th>Reason (if Unavailable)</th>
-                        <th>Request for Blood</th>
+                        <th>Select</th>
                       </tr>';
                 echo '</thead><tbody>';
                 while ($row = $result->fetch_assoc()) {
@@ -76,13 +77,10 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                         : '<span class="availability-no">No</span>';
                     $reason = $row['availability'] == 0 ? htmlspecialchars($row['reason']) : 'N/A';
 
-                    // Check availability to decide whether to display the button
-                    $requestButton = $row['availability'] == 1 
-                        ? "<form action='request_blood.php' method='POST'>
-                                <input type='hidden' name='donor_id' value='{$row['id']}'>
-                                <button type='submit' class='btn btn-warning'>Request Blood</button>
-                           </form>"
-                        : ''; // No button if availability is No
+                    // Only allow checkbox selection if the donor is available
+                    $checkbox = $row['availability'] == 1 
+                        ? "<input type='checkbox' name='donor_ids[]' value='{$row['id']}'>"
+                        : ''; // No checkbox if availability is No
 
                     echo "<tr>
                             <td>{$row['name']}</td>
@@ -92,10 +90,14 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                             <td>{$row['last_donation']}</td>
                             <td>$availability</td>
                             <td>$reason</td>
-                            <td>$requestButton</td>
+                            <td>$checkbox</td>
                           </tr>";
                 }
                 echo '</tbody></table>';
+                echo '<div class="text-center">';
+                echo '<button type="submit" class="btn btn-danger">Request Blood for Selected Donors</button>';
+                echo '</div>';
+                echo '</form>';
             } else {
                 echo '<div class="alert alert-warning text-center" role="alert">
                         No donors found for this blood group.
