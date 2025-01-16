@@ -66,6 +66,8 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
+    <a href="admin_logout.php" class="btn btn-secondary">Logout</a>
+
     <div class="container">
         <h1 class="text-center text-primary">Admin Panel</h1>
         
