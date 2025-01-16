@@ -50,58 +50,46 @@ $result = $conn->query($query);
             background-color: #f8f9fa;
         }
         .container {
-            margin: 20px auto;
-            padding: 0 5%; /* Left and right margin of 5% */
-            max-width: 1200px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            margin: 0 auto;
         }
-        .table-wrapper {
-            margin-top: 20px;
+        .table-responsive {
+            overflow-x: auto;
+        }
+        table {
+            table-layout: fixed;
+            word-wrap: break-word;
         }
         th, td {
+            text-align: left;
             vertical-align: middle;
-            text-align: center;
         }
-        .action-column {
-            width: 200px;
+        .logout-btn {
+            float: right;
+            margin-right: 20px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="admin.php">Admin Panel</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link btn btn-danger text-white px-3" href="admin_logout.php">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<!-- Logout Button -->
+<a href="admin_logout.php" class="btn btn-secondary logout-btn">Logout</a>
 
-<!-- Main Content -->
-<div class="container">
-    <h1 class="text-center text-primary mt-3">Admin Panel</h1>
+<div class="container mt-5">
+    <h1 class="text-center text-primary mb-4">Admin Panel</h1>
 
+    <!-- Success Message -->
     <?php if (isset($message)) { ?>
         <div class="alert alert-success text-center">
             <?php echo $message; ?>
         </div>
     <?php } ?>
 
-    <div class="table-wrapper">
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
+    <!-- Table Wrapper for Scrollable Content -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark text-center">
                 <tr>
                     <th>Request ID</th>
                     <th>Requester Name</th>
@@ -116,29 +104,30 @@ $result = $conn->query($query);
                     <th>Message</th>
                     <th>Status</th>
                     <th>Remarks</th>
-                    <th class="action-column">Action</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <?php while ($row = $result->fetch_assoc()) { ?>
                     <tr>
-                        <td><?php echo $row['id']; ?></td>
-                        <td><?php echo $row['requester_name']; ?></td>
-                        <td><?php echo $row['requester_mobile']; ?></td>
-                        <td><?php echo $row['requester_email'] ?: 'N/A'; ?></td>
-                        <td><?php echo $row['recipient_name']; ?></td>
-                        <td><?php echo $row['donor_name']; ?></td>
-                        <td><?php echo $row['donor_mobile']; ?></td>
-                        <td><?php echo $row['donor_email'] ?: 'N/A'; ?></td>
-                        <td><?php echo $row['blood_group']; ?></td>
-                        <td><?php echo $row['hospital']; ?></td>
-                        <td><?php echo $row['message']; ?></td>
-                        <td><?php echo $row['status']; ?></td>
-                        <td><?php echo $row['rejection_reason']; ?></td>
+                        <td class="text-center"><?php echo $row['id']; ?></td>
+                        <td><?php echo htmlspecialchars($row['requester_name']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['requester_mobile']); ?></td>
+                        <td><?php echo htmlspecialchars($row['requester_email'] ?: 'N/A'); ?></td>
+                        <td><?php echo htmlspecialchars($row['recipient_name']); ?></td>
+                        <td><?php echo htmlspecialchars($row['donor_name']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['donor_mobile']); ?></td>
+                        <td><?php echo htmlspecialchars($row['donor_email'] ?: 'N/A'); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['blood_group']); ?></td>
+                        <td><?php echo htmlspecialchars($row['hospital']); ?></td>
+                        <td><?php echo htmlspecialchars($row['message']); ?></td>
+                        <td class="text-center"><?php echo htmlspecialchars($row['status']); ?></td>
+                        <td><?php echo htmlspecialchars($row['rejection_reason'] ?: 'N/A'); ?></td>
                         <td>
-                            <form method="POST" class="status-update-form">
+                            <form method="POST" class="d-flex flex-column gap-2">
                                 <input type="hidden" name="request_id" value="<?php echo $row['id']; ?>">
-                                
+
+                                <!-- Status Dropdown -->
                                 <select name="status" class="form-select">
                                     <option value="Pending" <?php echo ($row['status'] == 'Pending' ? 'selected' : ''); ?>>Pending</option>
                                     <option value="Approved" <?php echo ($row['status'] == 'Approved' ? 'selected' : ''); ?>>Approved</option>
@@ -146,9 +135,11 @@ $result = $conn->query($query);
                                     <option value="Donated" <?php echo ($row['status'] == 'Donated' ? 'selected' : ''); ?>>Donated</option>
                                 </select>
 
-                                <textarea name="rejection_reason" class="form-control mt-2" rows="2" placeholder="Enter reason for rejection"><?php echo htmlspecialchars($row['rejection_reason']); ?></textarea>
+                                <!-- Remarks Input -->
+                                <textarea name="rejection_reason" class="form-control" placeholder="Enter remarks" rows="2"><?php echo htmlspecialchars($row['rejection_reason']); ?></textarea>
 
-                                <button type="submit" name="update_status" class="btn btn-primary mt-2 w-100">Update</button>
+                                <!-- Update Button -->
+                                <button type="submit" name="update_status" class="btn btn-primary">Update</button>
                             </form>
                         </td>
                     </tr>
@@ -159,7 +150,6 @@ $result = $conn->query($query);
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
 </html>
 
