@@ -5,9 +5,22 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Fetch donor details from POST
+$donorId = htmlspecialchars($_POST['donor_id'] ?? '');
+
+// Fetch donor details dynamically from the `users` table
+$donorQuery = "SELECT name, blood_group FROM users WHERE id = '$donorId'";
+$donorResult = $conn->query($donorQuery);
+if ($donorResult && $donorResult->num_rows > 0) {
+    $donor = $donorResult->fetch_assoc();
+    $donorName = $donor['name'];
+    $bloodGroup = $donor['blood_group'];
+} else {
+    die("Invalid donor ID.");
+}
+
 // Handle form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $donorId = $_POST['donor_id'];
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
     $requesterName = htmlspecialchars($_POST['requester_name']);
     $requesterMobile = htmlspecialchars($_POST['requester_mobile']);
     $requesterEmail = htmlspecialchars($_POST['requester_email'] ?? null);
@@ -25,13 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               VALUES ('$donorId', '$requesterName', '$requesterMobile', '$requesterEmail', '$recipientName', 
                       '$recipientMobile', '$recipientEmail', '$hospital', '$doctorName', '$relation', '$message')";
     if ($conn->query($query) === TRUE) {
-        echo '<div class="alert alert-success text-center" role="alert">
-                Blood request sent successfully!
-              </div>';
+        $successMessage = "Blood request sent successfully!";
     } else {
-        echo '<div class="alert alert-danger text-center" role="alert">
-                Error: ' . $conn->error . '
-              </div>';
+        $errorMessage = "Error: " . $conn->error;
     }
 }
 ?>
@@ -64,9 +73,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <div class="container">
         <div class="form-container">
             <h2 class="text-center text-danger">Request Blood</h2>
+            <?php if (isset($successMessage)) { ?>
+                <div class="alert alert-success text-center" role="alert">
+                    <?php echo $successMessage; ?>
+                </div>
+            <?php } elseif (isset($errorMessage)) { ?>
+                <div class="alert alert-danger text-center" role="alert">
+                    <?php echo $errorMessage; ?>
+                </div>
+            <?php } ?>
+            
+            <!-- Display Donor Details -->
+            <div class="alert alert-info">
+                <strong>Requesting Blood from Donor:</strong><br>
+                Donor Name: <b><?php echo $donorName; ?></b><br>
+                Blood Group: <b><?php echo $bloodGroup; ?></b><br>
+            </div>
+
+            <!-- Request Form -->
             <form action="" method="POST">
-                <!-- Hidden Donor ID -->
-                <input type="hidden" name="donor_id" value="<?php echo htmlspecialchars($_POST['donor_id'] ?? ''); ?>">
+                <!-- Hidden Donor Details -->
+                <input type="hidden" name="donor_id" value="<?php echo $donorId; ?>">
 
                 <!-- Requester Details -->
                 <h4>Requester Details</h4>
@@ -118,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                 <!-- Submit Button -->
                 <div class="text-center">
-                    <button type="submit" class="btn btn-danger">Submit Request</button>
+                    <button type="submit" name="submit_request" class="btn btn-danger">Submit Request</button>
                 </div>
             </form>
         </div>
