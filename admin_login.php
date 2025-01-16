@@ -7,14 +7,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Initialize variables
-$error_message = '';
-
+// Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = htmlspecialchars($_POST['username']);
     $password = htmlspecialchars($_POST['password']);
 
-    // Fetch admin data
+    // Fetch admin details
     $query = "SELECT * FROM admin_login WHERE username = ?";
     $stmt = $conn->prepare($query);
     $stmt->bind_param("s", $username);
@@ -24,18 +22,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
 
-        // Verify password and check status
-        if (md5($password) === $admin['password']) { // MD5 check
-            if ($admin['status'] == 1) { // Check if active
+        // Check if account is active
+        if ($admin['status'] == 1) {
+            // Verify password (assuming MD5 is used)
+            if (md5($password) === $admin['password']) {
+                // Set session variables for logged-in admin
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_username'] = $admin['username'];
+
+                // Redirect to admin panel
                 header('Location: admin.php');
                 exit;
             } else {
-                $error_message = "Your account is inactive. Please contact the system administrator.";
+                $error_message = "Incorrect password.";
             }
         } else {
-            $error_message = "Invalid password.";
+            $error_message = "Your account is inactive. Please contact the system administrator.";
         }
     } else {
         $error_message = "Invalid username.";
@@ -56,21 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         .login-container {
             max-width: 400px;
-            margin: 100px auto;
+            margin: 50px auto;
             padding: 20px;
-            background-color: white;
+            background-color: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2 class="text-center text-primary">Admin Login</h2>
-        <?php if ($error_message): ?>
-            <div class="alert alert-danger"><?php echo $error_message; ?></div>
-        <?php endif; ?>
-        <form action="" method="POST">
+        <h2 class="text-center">Admin Login</h2>
+        <?php if (isset($error_message)) { ?>
+            <div class="alert alert-danger text-center"><?php echo $error_message; ?></div>
+        <?php } ?>
+        <form method="POST">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" name="username" id="username" class="form-control" required>
@@ -84,9 +86,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
         </form>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-<?php $conn->close(); ?>
