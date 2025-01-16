@@ -1,3 +1,43 @@
+<?php
+session_start();
+
+// Check if the admin is logged in
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    // Redirect to login page if not logged in
+    header('Location: admin_login.php');
+    exit;
+}
+
+// Database connection
+$conn = new mysqli('localhost', 'root', 'root', 'blood_donation');
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle form submission to update status and rejection reason
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
+    $requestId = htmlspecialchars($_POST['request_id']);
+    $status = htmlspecialchars($_POST['status']);
+    $rejectionReason = htmlspecialchars($_POST['rejection_reason'] ?? 'N/A');
+
+    $query = "UPDATE blood_requests SET status = '$status', rejection_reason = '$rejectionReason' WHERE id = '$requestId'";
+    if ($conn->query($query) === TRUE) {
+        $message = "Request updated successfully!";
+    } else {
+        $message = "Error updating request: " . $conn->error;
+    }
+}
+
+// Fetch all blood requests
+$query = "SELECT br.id, br.requester_name, br.requester_mobile, br.requester_email, 
+          br.recipient_name, u.name AS donor_name, u.mobile AS donor_mobile, u.email AS donor_email, 
+          u.blood_group, br.hospital, br.message, br.status, br.rejection_reason 
+          FROM blood_requests br 
+          LEFT JOIN users u ON br.donor_id = u.id 
+          ORDER BY br.id DESC";
+$result = $conn->query($query);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -132,3 +172,5 @@
     </script>
 </body>
 </html>
+
+<?php $conn->close(); ?>
