@@ -105,6 +105,15 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                         ? '<span class="availability-yes">Yes</span>' 
                         : '<span class="availability-no">No</span>';
                     $reason = $row['availability'] == 0 ? htmlspecialchars($row['reason']) : 'N/A';
+                    
+                    // Check availability to decide whether to display the button
+                    $requestButton = $row['availability'] == 1 
+                        ? "<form action='request_blood.php' method='POST'>
+                                <input type='hidden' name='donor_id' value='{$row['id']}'>
+                                <button type='submit' class='btn btn-warning'>Request Blood</button>
+                           </form>"
+                        : ''; // No button if availability is No
+                
                     echo "<tr>
                             <td>{$row['name']}</td>
                             <td>{$row['age']}</td>
@@ -113,12 +122,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                             <td>{$row['last_donation']}</td>
                             <td>$availability</td>
                             <td>$reason</td>
-                            <td>
-                                <form action='request_blood.php' method='POST'>
-                                    <input type='hidden' name='donor_id' value='{$row['id']}'>
-                                    <button type='submit' class='btn btn-warning'>Request Blood</button>
-                                </form>
-                            </td>
+                            <td>$requestButton</td>
                           </tr>";
                 }
                 echo '</tbody></table>';
