@@ -5,11 +5,15 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle status update
+// Handle status and rejection reason update
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
     $requestId = intval($_POST['request_id']);
     $newStatus = $conn->real_escape_string($_POST['status']);
-    $updateQuery = "UPDATE blood_requests SET status = '$newStatus' WHERE id = $requestId";
+    $rejectionReason = $conn->real_escape_string($_POST['rejection_reason'] ?? null);
+
+    $updateQuery = "UPDATE blood_requests 
+                    SET status = '$newStatus', rejection_reason = " . ($newStatus == 'Rejected' ? "'$rejectionReason'" : "NULL") . " 
+                    WHERE id = $requestId";
 
     if ($conn->query($updateQuery)) {
         $successMessage = "Request status updated successfully!";
@@ -19,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
 }
 
 // Fetch all blood requests
-$query = "SELECT br.id, br.requester_name, br.recipient_name, br.hospital, br.message, br.status, 
-                 u.name AS donor_name, u.blood_group 
+$query = "SELECT br.id, br.requester_name, br.recipient_name, br.hospital, br.message, br.status, br.rejection_reason, 
+                 u.name AS donor_name, u.blood_group, u.mobile AS donor_mobile, u.email AS donor_email 
           FROM blood_requests br 
           JOIN users u ON br.donor_id = u.id
           ORDER BY br.request_date DESC";
@@ -75,10 +79,13 @@ $result = $conn->query($query);
                     <th>Requester Name</th>
                     <th>Recipient Name</th>
                     <th>Donor Name</th>
+                    <th>Donor Mobile</th>
+                    <th>Donor Email</th>
                     <th>Blood Group</th>
                     <th>Hospital</th>
                     <th>Message</th>
                     <th>Status</th>
+                    <th>Reason for Rejection</th>
                     <th>Action</th>
                 </tr>
             </thead>
@@ -87,15 +94,19 @@ $result = $conn->query($query);
                 if ($result && $result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
                         $statusClass = strtolower($row['status']);
+                        $rejectionReason = $row['status'] == 'Rejected' ? $row['rejection_reason'] : 'N/A';
                         echo "<tr>
                                 <td>{$row['id']}</td>
                                 <td>{$row['requester_name']}</td>
                                 <td>{$row['recipient_name']}</td>
                                 <td>{$row['donor_name']}</td>
+                                <td>{$row['donor_mobile']}</td>
+                                <td>{$row['donor_email']}</td>
                                 <td>{$row['blood_group']}</td>
                                 <td>{$row['hospital']}</td>
                                 <td>{$row['message']}</td>
                                 <td class='status-$statusClass'>{$row['status']}</td>
+                                <td>$rejectionReason</td>
                                 <td>
                                     <form method='POST'>
                                         <input type='hidden' name='request_id' value='{$row['id']}'>
@@ -104,13 +115,14 @@ $result = $conn->query($query);
                                             <option value='Approved' " . ($row['status'] == 'Approved' ? 'selected' : '') . ">Approved</option>
                                             <option value='Rejected' " . ($row['status'] == 'Rejected' ? 'selected' : '') . ">Rejected</option>
                                         </select>
+                                        <textarea name='rejection_reason' class='form-control mt-2' placeholder='Enter reason for rejection'>" . ($row['status'] == 'Rejected' ? $row['rejection_reason'] : '') . "</textarea>
                                         <button type='submit' name='update_status' class='btn btn-primary mt-2'>Update</button>
                                     </form>
                                 </td>
                               </tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='9' class='text-center'>No requests found.</td></tr>";
+                    echo "<tr><td colspan='12' class='text-center'>No requests found.</td></tr>";
                 }
                 ?>
             </tbody>
