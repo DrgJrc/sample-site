@@ -108,7 +108,7 @@ $result = $conn->query($query);
                         <th>Hospital</th>
                         <th>Message</th>
                         <th>Status</th>
-                        <th>Reason for Rejection</th>
+                        <th>Remarks</th>
                         <th>Action</th>
                     </tr>
                 </thead>
