@@ -32,27 +32,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['donor_ids'])) {
     }
 
     if (!empty($insertedRequests)) {
-        echo '<div class="container mt-5">';
-        echo '<div class="alert alert-success text-center">Blood request(s) sent successfully!</div>';
-        echo '<h4>Inserted Records</h4>';
-        echo '<table class="table table-bordered">';
-        echo '<thead><tr><th>Requester Name</th><th>Recipient Name</th><th>Hospital</th><th>Message</th></tr></thead>';
-        echo '<tbody>';
+        echo '<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Summary</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .summary-card {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .table {
+            margin-top: 20px;
+        }
+        .btn-home {
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="summary-card">
+            <h2 class="text-center text-success">Blood Request Summary</h2>
+            <p class="text-center">Your blood request(s) have been sent successfully!</p>
+            <table class="table table-bordered table-striped text-center">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Requester Name</th>
+                        <th>Recipient Name</th>
+                        <th>Hospital</th>
+                        <th>Message</th>
+                    </tr>
+                </thead>
+                <tbody>';
         foreach ($insertedRequests as $id) {
             $result = $conn->query("SELECT requester_name, recipient_name, hospital, message FROM blood_requests WHERE id = $id");
             if ($result && $result->num_rows > 0) {
                 $row = $result->fetch_assoc();
-                echo '<tr>';
-                echo '<td>' . htmlspecialchars($row['requester_name']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['recipient_name']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['hospital']) . '</td>';
-                echo '<td>' . htmlspecialchars($row['message']) . '</td>';
-                echo '</tr>';
+                echo '<tr>
+                        <td>' . htmlspecialchars($row['requester_name']) . '</td>
+                        <td>' . htmlspecialchars($row['recipient_name']) . '</td>
+                        <td>' . htmlspecialchars($row['hospital']) . '</td>
+                        <td>' . htmlspecialchars($row['message']) . '</td>
+                      </tr>';
             }
         }
-        echo '</tbody></table>';
-        echo '<a href="index.php" class="btn btn-primary">Back to Home</a>';
-        echo '</div>';
+        echo '</tbody>
+            </table>
+            <a href="index.php" class="btn btn-primary btn-home">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>';
     } else {
         echo '<div class="alert alert-danger text-center">Error processing requests.</div>';
     }
