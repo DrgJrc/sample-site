@@ -5,29 +5,27 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Handle status and rejection reason update
+// Handle form submission to update status and rejection reason
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['update_status'])) {
-    $requestId = intval($_POST['request_id']);
-    $newStatus = $conn->real_escape_string($_POST['status']);
-    $rejectionReason = $conn->real_escape_string($_POST['rejection_reason'] ?? null);
+    $requestId = htmlspecialchars($_POST['request_id']);
+    $status = htmlspecialchars($_POST['status']);
+    $rejectionReason = htmlspecialchars($_POST['rejection_reason'] ?? 'N/A');
 
-    $updateQuery = "UPDATE blood_requests 
-                    SET status = '$newStatus', rejection_reason = " . ($newStatus == 'Rejected' ? "'$rejectionReason'" : "NULL") . " 
-                    WHERE id = $requestId";
-
-    if ($conn->query($updateQuery)) {
-        $successMessage = "Request status updated successfully!";
+    $query = "UPDATE blood_requests SET status = '$status', rejection_reason = '$rejectionReason' WHERE id = '$requestId'";
+    if ($conn->query($query) === TRUE) {
+        $message = "Request updated successfully!";
     } else {
-        $errorMessage = "Error updating status: " . $conn->error;
+        $message = "Error updating request: " . $conn->error;
     }
 }
 
 // Fetch all blood requests
-$query = "SELECT br.id, br.requester_name, br.recipient_name, br.hospital, br.message, br.status, br.rejection_reason, 
-                 u.name AS donor_name, u.blood_group, u.mobile AS donor_mobile, u.email AS donor_email 
+$query = "SELECT br.id, br.requester_name, br.recipient_name, u.name AS donor_name, 
+          u.mobile AS donor_mobile, u.email AS donor_email, u.blood_group, br.hospital, 
+          br.message, br.status, br.rejection_reason 
           FROM blood_requests br 
-          JOIN users u ON br.donor_id = u.id
-          ORDER BY br.request_date DESC";
+          LEFT JOIN users u ON br.donor_id = u.id 
+          ORDER BY br.id DESC";
 $result = $conn->query($query);
 ?>
 
@@ -43,92 +41,87 @@ $result = $conn->query($query);
             background-color: #f8f9fa;
         }
         .container {
-            margin-top: 50px;
+            margin-top: 20px;
         }
-        .status-approved {
-            color: green;
-            font-weight: bold;
+        .table-wrapper {
+            margin-top: 20px;
         }
-        .status-rejected {
-            color: red;
-            font-weight: bold;
+        .status-update-form select, .status-update-form textarea {
+            margin-bottom: 10px;
         }
-        .status-pending {
-            color: orange;
-            font-weight: bold;
+        .status-update-form button {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 class="text-center text-primary">Admin Panel</h1>
-        <?php if (isset($successMessage)) { ?>
+        
+        <?php if (isset($message)) { ?>
             <div class="alert alert-success text-center">
-                <?php echo $successMessage; ?>
-            </div>
-        <?php } elseif (isset($errorMessage)) { ?>
-            <div class="alert alert-danger text-center">
-                <?php echo $errorMessage; ?>
+                <?php echo $message; ?>
             </div>
         <?php } ?>
+        
+        <div class="table-wrapper">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Request ID</th>
+                        <th>Requester Name</th>
+                        <th>Recipient Name</th>
+                        <th>Donor Name</th>
+                        <th>Donor Mobile</th>
+                        <th>Donor Email</th>
+                        <th>Blood Group</th>
+                        <th>Hospital</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Reason for Rejection</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $result->fetch_assoc()) { ?>
+                        <tr>
+                            <td><?php echo $row['id']; ?></td>
+                            <td><?php echo $row['requester_name']; ?></td>
+                            <td><?php echo $row['recipient_name']; ?></td>
+                            <td><?php echo $row['donor_name']; ?></td>
+                            <td><?php echo $row['donor_mobile']; ?></td>
+                            <td><?php echo $row['donor_email']; ?></td>
+                            <td><?php echo $row['blood_group']; ?></td>
+                            <td><?php echo $row['hospital']; ?></td>
+                            <td><?php echo $row['message']; ?></td>
+                            <td><?php echo $row['status']; ?></td>
+                            <td><?php echo $row['rejection_reason']; ?></td>
+                            <td>
+                                <form method="POST" class="status-update-form">
+                                    <input type="hidden" name="request_id" value="<?php echo $row['id']; ?>">
+                                    
+                                    <!-- Status Dropdown -->
+                                    <select name="status" class="form-select">
+                                        <option value="Pending" <?php echo ($row['status'] == 'Pending' ? 'selected' : ''); ?>>Pending</option>
+                                        <option value="Approved" <?php echo ($row['status'] == 'Approved' ? 'selected' : ''); ?>>Approved</option>
+                                        <option value="Rejected" <?php echo ($row['status'] == 'Rejected' ? 'selected' : ''); ?>>Rejected</option>
+                                    </select>
 
-        <table class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th>Request ID</th>
-                    <th>Requester Name</th>
-                    <th>Recipient Name</th>
-                    <th>Donor Name</th>
-                    <th>Donor Mobile</th>
-                    <th>Donor Email</th>
-                    <th>Blood Group</th>
-                    <th>Hospital</th>
-                    <th>Message</th>
-                    <th>Status</th>
-                    <th>Reason for Rejection</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if ($result && $result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $statusClass = strtolower($row['status']);
-                        $rejectionReason = $row['status'] == 'Rejected' ? $row['rejection_reason'] : 'N/A';
-                        echo "<tr>
-                                <td>{$row['id']}</td>
-                                <td>{$row['requester_name']}</td>
-                                <td>{$row['recipient_name']}</td>
-                                <td>{$row['donor_name']}</td>
-                                <td>{$row['donor_mobile']}</td>
-                                <td>{$row['donor_email']}</td>
-                                <td>{$row['blood_group']}</td>
-                                <td>{$row['hospital']}</td>
-                                <td>{$row['message']}</td>
-                                <td class='status-$statusClass'>{$row['status']}</td>
-                                <td>$rejectionReason</td>
-                                <td>
-                                    <form method='POST'>
-                                        <input type='hidden' name='request_id' value='{$row['id']}'>
-                                        <select name='status' class='form-select'>
-                                            <option value='Pending' " . ($row['status'] == 'Pending' ? 'selected' : '') . ">Pending</option>
-                                            <option value='Approved' " . ($row['status'] == 'Approved' ? 'selected' : '') . ">Approved</option>
-                                            <option value='Rejected' " . ($row['status'] == 'Rejected' ? 'selected' : '') . ">Rejected</option>
-                                        </select>
-                                        <textarea name='rejection_reason' class='form-control mt-2' placeholder='Enter reason for rejection'>" . ($row['status'] == 'Rejected' ? $row['rejection_reason'] : '') . "</textarea>
-                                        <button type='submit' name='update_status' class='btn btn-primary mt-2'>Update</button>
-                                    </form>
-                                </td>
-                              </tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='12' class='text-center'>No requests found.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-        <a href="index.php" class="btn btn-secondary mt-3">Back to Home</a>
+                                    <!-- Rejection Reason -->
+                                    <textarea name="rejection_reason" class="form-control" rows="2" placeholder="Enter reason for rejection"><?php echo htmlspecialchars($row['rejection_reason']); ?></textarea>
+
+                                    <!-- Update Button -->
+                                    <button type="submit" name="update_status" class="btn btn-primary w-100">Update</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
+        </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
