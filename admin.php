@@ -91,7 +91,7 @@ $result = $conn->query($query);
         <table class="table table-bordered table-striped align-middle">
             <thead class="table-dark text-center">
                 <tr>
-                    <th>Request ID</th>
+                    <th>Req.ID</th>
                     <th>Requester Name</th>
                     <th>Requester Mobile</th>
                     <th>Requester Email</th>
@@ -104,7 +104,7 @@ $result = $conn->query($query);
                     <th>Message</th>
                     <th>Status</th>
                     <th>Remarks</th>
-                    <th>Action</th>
+                    <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
                 </tr>
             </thead>
             <tbody>
