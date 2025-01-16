@@ -5,22 +5,9 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch donor details from POST
-$donorId = htmlspecialchars($_POST['donor_id'] ?? '');
-
-// Fetch donor details dynamically from the `users` table
-$donorQuery = "SELECT name, blood_group FROM users WHERE id = '$donorId'";
-$donorResult = $conn->query($donorQuery);
-if ($donorResult && $donorResult->num_rows > 0) {
-    $donor = $donorResult->fetch_assoc();
-    $donorName = $donor['name'];
-    $bloodGroup = $donor['blood_group'];
-} else {
-    die("Invalid donor ID.");
-}
-
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
+    $donorIds = $_POST['donor_ids'] ?? []; // Array of selected donor IDs
     $requesterName = htmlspecialchars($_POST['requester_name']);
     $requesterMobile = htmlspecialchars($_POST['requester_mobile']);
     $requesterEmail = htmlspecialchars($_POST['requester_email'] ?? null);
@@ -32,16 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
     $relation = htmlspecialchars($_POST['relation']);
     $message = htmlspecialchars($_POST['message'] ?? null);
 
-    // Insert into database
-    $query = "INSERT INTO blood_requests (donor_id, requester_name, requester_mobile, requester_email, recipient_name, 
-              recipient_mobile, recipient_email, hospital, doctor_name, relation, message)
-              VALUES ('$donorId', '$requesterName', '$requesterMobile', '$requesterEmail', '$recipientName', 
-                      '$recipientMobile', '$recipientEmail', '$hospital', '$doctorName', '$relation', '$message')";
-    if ($conn->query($query) === TRUE) {
-        $successMessage = "Blood request sent successfully!";
-    } else {
-        $errorMessage = "Error: " . $conn->error;
+    // Insert request for each selected donor
+    foreach ($donorIds as $donorId) {
+        $query = "INSERT INTO blood_requests (donor_id, requester_name, requester_mobile, requester_email, recipient_name, 
+                  recipient_mobile, recipient_email, hospital, doctor_name, relation, message)
+                  VALUES ('$donorId', '$requesterName', '$requesterMobile', '$requesterEmail', '$recipientName', 
+                          '$recipientMobile', '$recipientEmail', '$hospital', '$doctorName', '$relation', '$message')";
+        if (!$conn->query($query)) {
+            echo '<div class="alert alert-danger text-center" role="alert">
+                    Error: ' . $conn->error . '
+                  </div>';
+        }
     }
+
+    echo '<div class="alert alert-success text-center" role="alert">
+            Blood request(s) sent successfully!
+          </div>';
 }
 ?>
 
@@ -52,32 +45,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Blood</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .form-container {
+            margin-top: 50px;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .required {
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="form-container">
             <h2 class="text-center text-danger">Request Blood</h2>
-            <?php if (isset($successMessage)) { ?>
-                <div class="alert alert-success text-center" role="alert">
-                    <?php echo $successMessage; ?>
-                </div>
-            <?php } elseif (isset($errorMessage)) { ?>
-                <div class="alert alert-danger text-center" role="alert">
-                    <?php echo $errorMessage; ?>
+            
+            <?php if (!empty($donorIds)) { ?>
+                <div class="alert alert-info">
+                    <strong>Requesting Blood from Donors:</strong><br>
+                    <?php
+                    // Fetch and display donor names and blood groups
+                    $ids = implode(',', array_map('intval', $donorIds));
+                    $donorQuery = "SELECT name, blood_group FROM users WHERE id IN ($ids)";
+                    $donorResult = $conn->query($donorQuery);
+                    if ($donorResult && $donorResult->num_rows > 0) {
+                        while ($donor = $donorResult->fetch_assoc()) {
+                            echo "Donor Name: <b>{$donor['name']}</b>, Blood Group: <b>{$donor['blood_group']}</b><br>";
+                        }
+                    }
+                    ?>
                 </div>
             <?php } ?>
-            
-            <!-- Display Donor Details -->
-            <div class="alert alert-info">
-                <strong>Requesting Blood from Donor:</strong><br>
-                Donor Name: <b><?php echo $donorName; ?></b><br>
-                Blood Group: <b><?php echo $bloodGroup; ?></b><br>
-            </div>
 
             <!-- Request Form -->
             <form action="" method="POST">
-                <!-- Hidden Donor Details -->
-                <input type="hidden" name="donor_id" value="<?php echo $donorId; ?>">
+                <!-- Hidden Donor IDs -->
+                <?php foreach ($donorIds as $donorId) { ?>
+                    <input type="hidden" name="donor_ids[]" value="<?php echo htmlspecialchars($donorId); ?>">
+                <?php } ?>
 
                 <!-- Requester Details -->
                 <h4>Requester Details</h4>
@@ -134,5 +145,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
             </form>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
+
+<?php $conn->close(); ?>
