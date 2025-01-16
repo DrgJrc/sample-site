@@ -97,6 +97,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                         <th>Last Donation Date</th>
                         <th>Availability</th>
                         <th>Reason (if Unavailable)</th>
+                        <th>Request for Blood</th>
                       </tr>';
                 echo '</thead><tbody>';
                 while ($row = $result->fetch_assoc()) {
@@ -112,6 +113,12 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                             <td>{$row['last_donation']}</td>
                             <td>$availability</td>
                             <td>$reason</td>
+                            <td>
+                                <form action="request_blood.php" method="POST">
+                                    <input type="hidden" name="donor_id" value="<?php echo $row['id']; ?>">
+                                    <button type="submit" class="btn btn-warning">Request Blood</button>
+                                </form>
+                            </td>
                           </tr>";
                 }
                 echo '</tbody></table>';
