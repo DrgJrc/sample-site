@@ -15,7 +15,6 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donor Details</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
@@ -59,18 +58,18 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
             if ($result && $result->num_rows > 0) {
                 echo '<form action="request_blood.php" method="POST">';
                 echo '<table class="table table-bordered table-striped">';
-                echo '<thead class="table-dark">';
-                echo '<tr>
-                        <th>Name</th>
-                        <th>Age</th>
-                        <th>Address</th>
-                        <th>Blood Group</th>
-                        <th>Last Donation Date</th>
-                        <th>Availability</th>
-                        <th>Reason (if Unavailable)</th>
-                        <th>Select</th>
-                      </tr>';
-                echo '</thead><tbody>';
+                echo '<thead class="table-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Age</th>
+                            <th>Address</th>
+                            <th>Blood Group</th>
+                            <th>Last Donation Date</th>
+                            <th>Availability</th>
+                            <th>Reason (if Unavailable)</th>
+                            <th>Select</th>
+                        </tr>
+                      </thead><tbody>';
                 while ($row = $result->fetch_assoc()) {
                     $availability = $row['availability'] == 1 
                         ? '<span class="availability-yes">Yes</span>' 
@@ -79,7 +78,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
 
                     // Only allow checkbox selection if the donor is available
                     $checkbox = $row['availability'] == 1 
-                        ? "<input type='checkbox' name='donor_ids[]' value='{$row['id']}'>"
+                        ? "<input type='checkbox' name='donor_ids[]' value='{$row['id']}'>" 
                         : ''; // No checkbox if availability is No
 
                     echo "<tr>
