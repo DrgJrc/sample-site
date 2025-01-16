@@ -48,6 +48,7 @@ $result = $conn->query($query);
     <style>
         body {
             background-color: #f8f9fa;
+            font-size: 0.8rem; /* Reduced font size by 20% */
         }
         .container {
             max-width: 90%;
@@ -63,6 +64,24 @@ $result = $conn->query($query);
         th, td {
             text-align: left;
             vertical-align: middle;
+        }
+        th {
+            text-align: center;
+        }
+        th[colspan="1"] {
+            width: 5%; /* Reduced column width for specific columns */
+        }
+        th[colspan="2"], td[colspan="2"] {
+            width: 10%;
+        }
+        th[colspan="3"], td[colspan="3"] {
+            width: 15%;
+        }
+        th[colspan="4"], td[colspan="4"] {
+            width: 20%;
+        }
+        th[colspan="7"] {
+            width: 25%;
         }
         .logout-btn {
             float: right;
@@ -91,7 +110,7 @@ $result = $conn->query($query);
         <table class="table table-bordered table-striped align-middle">
             <thead class="table-dark text-center">
                 <tr>
-                    <th>Req.ID</th>
+                    <th>Req. ID</th>
                     <th>Requester Name</th>
                     <th>Requester Mobile</th>
                     <th>Requester Email</th>
@@ -104,7 +123,7 @@ $result = $conn->query($query);
                     <th>Message</th>
                     <th>Status</th>
                     <th>Remarks</th>
-                    <th>Action &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
