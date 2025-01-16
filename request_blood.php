@@ -5,6 +5,12 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    var_dump($_POST['donor_ids']);
+    exit; // Stop execution to verify output
+}
+
+
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
     $donorIds = $_POST['donor_ids'] ?? []; // Array of selected donor IDs
