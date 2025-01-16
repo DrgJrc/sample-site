@@ -30,13 +30,6 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
             display: block;
             margin: 20px auto;
         }
-        .search-input {
-            width: 100%;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
         .availability-yes {
             background-color: green;
             color: white;
@@ -64,32 +57,9 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
             $result = $conn->query($query);
 
             if ($result && $result->num_rows > 0) {
-                echo '<table class="table table-bordered table-striped" id="donorTable">';
+                echo '<table class="table table-bordered table-striped">';
                 echo '<thead class="table-dark">';
                 echo '<tr>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Name" onkeyup="searchColumn(0)">
-                        </th>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Age" onkeyup="searchColumn(1)">
-                        </th>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Address" onkeyup="searchColumn(2)">
-                        </th>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Blood Group" onkeyup="searchColumn(3)">
-                        </th>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Last Donation" onkeyup="searchColumn(4)">
-                        </th>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Availability" onkeyup="searchColumn(5)">
-                        </th>
-                        <th>
-                            <input type="text" class="search-input" placeholder="Search Reason" onkeyup="searchColumn(6)">
-                        </th>
-                      </tr>
-                      <tr>
                         <th>Name</th>
                         <th>Age</th>
                         <th>Address</th>
@@ -105,7 +75,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                         ? '<span class="availability-yes">Yes</span>' 
                         : '<span class="availability-no">No</span>';
                     $reason = $row['availability'] == 0 ? htmlspecialchars($row['reason']) : 'N/A';
-                    
+
                     // Check availability to decide whether to display the button
                     $requestButton = $row['availability'] == 1 
                         ? "<form action='request_blood.php' method='POST'>
@@ -113,7 +83,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                                 <button type='submit' class='btn btn-warning'>Request Blood</button>
                            </form>"
                         : ''; // No button if availability is No
-                
+
                     echo "<tr>
                             <td>{$row['name']}</td>
                             <td>{$row['age']}</td>
@@ -140,25 +110,6 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
 
         <a href="index.php" class="btn btn-primary back-button">Back to Home</a>
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function searchColumn(index) {
-            const input = document.getElementsByClassName('search-input')[index];
-            const filter = input.value.toLowerCase();
-            const table = document.getElementById('donorTable');
-            const rows = table.getElementsByTagName('tr');
-            
-            for (let i = 2; i < rows.length; i++) { // Skip first two rows (search inputs and headers)
-                const cells = rows[i].getElementsByTagName('td');
-                if (cells[index]) {
-                    const text = cells[index].innerText.toLowerCase();
-                    rows[i].style.display = text.includes(filter) ? '' : 'none';
-                }
-            }
-        }
-    </script>
 </body>
 </html>
 

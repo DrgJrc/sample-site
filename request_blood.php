@@ -51,23 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Request Blood</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #f8f9fa;
-        }
-        .form-container {
-            margin-top: 50px;
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        }
-        .required {
-            color: red;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -150,8 +134,5 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['submit_request'])) {
             </form>
         </div>
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>   
+</html>
