@@ -61,9 +61,24 @@ $blood_group_stats_result = $conn->query($blood_group_stats_query);
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="#">Blood Donation</a>
-        <div class="navbar-nav">
-            <a class="nav-link" href="register.php">Register as a Donor</a>
-            <a class="nav-link" href="login.php">Sign In</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="register.php">Register as a Donor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="login.php">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="request_status.php">Request Status</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="admin.php">Admin Panel</a>
+                </li>
+            </ul>
         </div>
     </div>
 </nav>
