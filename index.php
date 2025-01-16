@@ -93,24 +93,36 @@ $blood_group_stats_result = $conn->query($blood_group_stats_query);
 
     <!-- Blood Group-wise Statistics -->
     <h3 class="mt-5">Blood Group-wise Statistics</h3>
-    <table class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>Blood Group</th>
-                <th>Total Donors</th>
-                <th>Available Donors</th>
-            </tr>
-        </thead> 
-        <tbody>
-            <?php while ($row = $blood_group_stats_result->fetch_assoc()) { ?>
-                <tr>
-                    <td><?php echo $row['blood_group']; ?></td>
-                    <td><?php echo $row['total']; ?></td>
-                    <td><?php echo $row['available']; ?></td>
-                </tr>
-            <?php } ?>
-        </tbody>
-    </table>
+    <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Blood Group</th>
+            <th>Total Donors</th>
+            <th>Available Donors</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+    <?php
+        $query = "SELECT blood_group, COUNT(*) as total, SUM(availability) as available FROM users GROUP BY blood_group";
+        $result = $conn->query($query);
+
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $bloodGroup = urlencode($row['blood_group']); // Encode for URL safety
+                echo "<tr>
+                        <td>{$row['blood_group']}</td>
+                        <td>{$row['total']}</td>
+                        <td>{$row['available']}</td>
+                        <td><a href='donor_details.php?blood_group={$bloodGroup}' target='_blank' class='btn btn-primary'>View Details</a></td>
+                    </tr>";
+            }
+        }
+    ?>
+
+    </tbody>
+</table>
+
 </div>
 
 <!-- Footer -->
@@ -124,6 +136,24 @@ $blood_group_stats_result = $conn->query($blood_group_stats_query);
 <?php
 $conn->close();
 ?>
+
+<script>
+    function showDetails(bloodGroup) {
+        fetch('get_donor_details.php?blood_group=' + bloodGroup)
+            .then(response => response.json())
+            .then(data => {
+                let details = 'Donor Details for ' + bloodGroup + ':\n\n';
+                data.forEach(donor => {
+                    details += `Name: ${donor.name}\nAge: ${donor.age}\nAddress: ${donor.address}\nBlood Group: ${donor.blood_group}\nLast Donated: ${donor.last_donation}\n\n`;
+                });
+                alert(details);
+            })
+            .catch(error => {
+                console.error('Error fetching donor details:', error);
+            });
+    }
+</script>
+
 
 </body>
 </html>
