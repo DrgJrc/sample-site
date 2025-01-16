@@ -12,37 +12,32 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = htmlspecialchars($_POST['username']);
     $password = htmlspecialchars($_POST['password']);
 
-    // Fetch admin details
-    $query = "SELECT * FROM admin_login WHERE username = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Fetch admin details from the database
+    $query = "SELECT * FROM admin_login WHERE username = '$username'";
+    $result = $conn->query($query);
 
     if ($result->num_rows > 0) {
         $admin = $result->fetch_assoc();
 
-        // Check if account is active
-        if ($admin['status'] == 1) {
-            // Verify password (assuming MD5 is used)
-            if (md5($password) === $admin['password']) {
-                // Set session variables for logged-in admin
+        // Verify password and check status
+        if ($password === $admin['password']) { // Plain password check
+            if ($admin['status'] == 1) {
                 $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_username'] = $admin['username'];
-
-                // Redirect to admin panel
+                $_SESSION['admin_username'] = $username;
                 header('Location: admin.php');
                 exit;
             } else {
-                $error_message = "Incorrect password.";
+                $error = "Your account is inactive. Please contact the system administrator.";
             }
         } else {
-            $error_message = "Your account is inactive. Please contact the system administrator.";
+            $error = "Invalid username or password.";
         }
     } else {
-        $error_message = "Invalid username.";
+        $error = "Invalid username or password.";
     }
 }
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -55,22 +50,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <style>
         body {
             background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .login-container {
-            max-width: 400px;
-            margin: 50px auto;
+            background-color: white;
             padding: 20px;
-            background-color: #ffffff;
             border-radius: 8px;
             box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-container h1 {
+            margin-bottom: 20px;
         }
     </style>
 </head>
 <body>
     <div class="login-container">
-        <h2 class="text-center">Admin Login</h2>
-        <?php if (isset($error_message)) { ?>
-            <div class="alert alert-danger text-center"><?php echo $error_message; ?></div>
+        <h1 class="text-center text-primary">Admin Login</h1>
+        <?php if (isset($error)) { ?>
+            <div class="alert alert-danger text-center"><?php echo $error; ?></div>
         <?php } ?>
         <form method="POST">
             <div class="mb-3">
@@ -81,10 +83,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <label for="password" class="form-label">Password</label>
                 <input type="password" name="password" id="password" class="form-control" required>
             </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary w-100">Login</button>
-            </div>
+            <button type="submit" class="btn btn-primary w-100">Login</button>
         </form>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
