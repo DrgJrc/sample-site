@@ -65,8 +65,23 @@ $result = $conn->query($query);
     </style>
 </head>
 <body>
-    <a href="admin_logout.php" class="btn btn-secondary">Logout</a>
-
+    
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="admin.php">Admin Panel</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link btn btn-danger text-white px-3" href="admin_logout.php">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
     <div class="container">
         <h1 class="text-center text-primary">Admin Panel</h1>
         
@@ -93,7 +108,7 @@ $result = $conn->query($query);
                         <th><input type="text" class="search-input" placeholder="Search Message" onkeyup="filterTable(10)"></th>
                         <th><input type="text" class="search-input" placeholder="Search Status" onkeyup="filterTable(11)"></th>
                         <th><input type="text" class="search-input" placeholder="Search Reason for Rejection" onkeyup="filterTable(12)"></th>
-                        <th>Action</th>
+                        <th style="width: 150px;">Action</th>
                     </tr>
                     <tr>
                         <th>Request ID</th>
@@ -109,7 +124,7 @@ $result = $conn->query($query);
                         <th>Message</th>
                         <th>Status</th>
                         <th>Remarks</th>
-                        <th>Action</th>
+                        <th style="width: 150px;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
