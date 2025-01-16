@@ -59,7 +59,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
 
         <?php
         if ($bloodGroup) {
-            $query = "SELECT name, YEAR(CURDATE()) - YEAR(dob) AS age, address, blood_group, last_donation, 
+            $query = "SELECT id, name, YEAR(CURDATE()) - YEAR(dob) AS age, address, blood_group, last_donation, 
                       availability, reason FROM users WHERE blood_group = '$bloodGroup'";
             $result = $conn->query($query);
 
@@ -114,9 +114,9 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                             <td>$availability</td>
                             <td>$reason</td>
                             <td>
-                                <form action="request_blood.php" method="POST">
-                                    <input type="hidden" name="donor_id" value="<?php echo $row['id']; ?>">
-                                    <button type="submit" class="btn btn-warning">Request Blood</button>
+                                <form action='request_blood.php' method='POST'>
+                                    <input type='hidden' name='donor_id' value='{$row['id']}'>
+                                    <button type='submit' class='btn btn-warning'>Request Blood</button>
                                 </form>
                             </td>
                           </tr>";
