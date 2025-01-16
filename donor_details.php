@@ -37,6 +37,20 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
             border-radius: 5px;
             margin-bottom: 10px;
         }
+        .availability-yes {
+            background-color: green;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .availability-no {
+            background-color: red;
+            color: white;
+            padding: 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -86,7 +100,9 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                       </tr>';
                 echo '</thead><tbody>';
                 while ($row = $result->fetch_assoc()) {
-                    $availability = $row['availability'] == 1 ? 'Yes' : 'No';
+                    $availability = $row['availability'] == 1 
+                        ? '<span class="availability-yes">Yes</span>' 
+                        : '<span class="availability-no">No</span>';
                     $reason = $row['availability'] == 0 ? htmlspecialchars($row['reason']) : 'N/A';
                     echo "<tr>
                             <td>{$row['name']}</td>
