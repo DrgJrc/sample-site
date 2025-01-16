@@ -86,9 +86,7 @@ $bloodGroup = isset($_GET['blood_group']) ? $conn->real_escape_string($_GET['blo
                       </tr>';
                 echo '</thead><tbody>';
                 while ($row = $result->fetch_assoc()) {
-                    $availability = $row['availability'] == 1 ? 
-                        '<span class="badge bg-success">Available</span>' : 
-                        '<span class="badge bg-danger">Unavailable</span>';
+                    $availability = $row['availability'] == 1 ? 'Yes' : 'No';
                     $reason = $row['availability'] == 0 ? htmlspecialchars($row['reason']) : 'N/A';
                     echo "<tr>
                             <td>{$row['name']}</td>
