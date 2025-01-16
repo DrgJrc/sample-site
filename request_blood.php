@@ -17,12 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $hospital = htmlspecialchars($_POST['hospital']);
     $doctorName = htmlspecialchars($_POST['doctor_name']);
     $relation = htmlspecialchars($_POST['relation']);
+    $message = htmlspecialchars($_POST['message'] ?? null);
 
     // Insert into database
     $query = "INSERT INTO blood_requests (donor_id, requester_name, requester_mobile, requester_email, recipient_name, 
-              recipient_mobile, recipient_email, hospital, doctor_name, relation)
+              recipient_mobile, recipient_email, hospital, doctor_name, relation, message)
               VALUES ('$donorId', '$requesterName', '$requesterMobile', '$requesterEmail', '$recipientName', 
-                      '$recipientMobile', '$recipientEmail', '$hospital', '$doctorName', '$relation')";
+                      '$recipientMobile', '$recipientEmail', '$hospital', '$doctorName', '$relation', '$message')";
     if ($conn->query($query) === TRUE) {
         echo '<div class="alert alert-success text-center" role="alert">
                 Blood request sent successfully!
@@ -107,6 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <div class="mb-3">
                     <label for="relation" class="form-label">Requester Relation with Recipient <span class="required">*</span></label>
                     <input type="text" name="relation" id="relation" class="form-control" required>
+                </div>
+
+                <!-- Message -->
+                <div class="mb-3">
+                    <label for="message" class="form-label">Message</label>
+                    <textarea name="message" id="message" rows="4" class="form-control" placeholder="Enter additional details (optional)"></textarea>
                 </div>
 
                 <!-- Submit Button -->
